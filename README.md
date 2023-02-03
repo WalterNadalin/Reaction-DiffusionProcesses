@@ -22,6 +22,7 @@ where
 
 In order to simulate it, it is used firstly a *naive* stochastic simulation algorithm (**SSA**) and then an improvement of it.
  
+## References
 <a id="PG">[1]</a> 
 Erban, Radek and Chapman, Jonathan and Maini, Philip (2007).
 *A practical guide to stochastic simulations of reaction-diffusion processes*.
