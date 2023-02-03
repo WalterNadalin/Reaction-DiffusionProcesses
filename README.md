@@ -1,5 +1,5 @@
 # A practical guide to stochastic simulations of reaction-diffusion processes
-This is an educational processes and is (almost) entirely based on [[1]](#PG).
+This is an educational project and is (almost) entirely based on [[1]](#PG).
  
 <a id="PG">[1]</a> 
 Erban, Radek and Chapman, Jonathan and Maini, Philip (2007).
