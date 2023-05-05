@@ -3,7 +3,7 @@ In this educational project I will attempt to explore and better learn the theor
 
 This work is (almost) entirely based on what has already been done in [[1]](#PG). In the explanations (again, heavily drawn from [[1]](#PG)) I will write some comments on probability, information theory, and statistical mechanics, topics I am currently studying. **Warning**: they may be completely wrong.
 
-The article is divided into the following sections (which follow the same structure as the article mentioned above). There will also be some `C++` and `python` codes that implement the algorithms and help visualize the results.
+The article is divided into the following sections (which follow the same structure as the article mentioned above). There will also be some `Rust` codes that implement the algorithms and help visualize the results.
 
 ## Stochastic simulation of chemical reactions
 Exploration of stochastic methods for the modelling of (spatially homogeneous) **systems of chemical reactions** through the following examples.
@@ -17,7 +17,9 @@ $$
 
 where
 - $A$ is the *chemical species* of interest
-- $k$ is the constant *rate* of the reaction
+- $k$ is the constant *rate* of the reaction defined so that $k dt$ gives the *probability* that a
+randomly chosen molecule of chemical species A reacts (is degraded) during the time
+interval $\[t, dt)$
 - $\emptyset$ denotes chemical species which are of *no further interest* in what follows
 
 In order to simulate it, it is used firstly a *naive* stochastic simulation algorithm (**SSA**) and then an improvement of it.
