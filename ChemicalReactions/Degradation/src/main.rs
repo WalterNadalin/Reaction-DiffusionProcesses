@@ -65,9 +65,9 @@ fn main() {
 	writer.flush().unwrap();
 	file.sync_all().unwrap(); // Wait that all the data are written on the file
 	
-  let duration = start.elapsed();
+	let duration = start.elapsed();
 
-  println!("\n\tTime: {:?}\n", duration);
+	println!("\n\tTime: {:?}\n", duration);
 
 	let _output = Command::new("gnuplot")
 		.arg("plots/plot.plt")
