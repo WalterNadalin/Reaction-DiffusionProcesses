@@ -9,13 +9,11 @@ use std::time::Instant;
 fn get_arg<T: FromStr + Debug>(index: usize, value: T) -> T 
 where <T as FromStr>::Err: Debug, {
 	// Returns the parsed argument passed to the command line at position `index`	
-  //
-  // # Arguments
-  // * `index` - An integer repreting the position of the argument to get (starting from 0)
-  // * `value` - A value to return if the argument is not found
-  use std::env::args;
-  
-	let arg: T = match  args().nth(index + 1) {
+	//
+	// # Arguments
+	// * `index` - An integer repreting the position of the argument to get (starting from 0)
+	// * `value` - A value to return if the argument is not found
+	let arg: T = match std::env::args().nth(index + 1) {
 		Some(val) => val.parse::<T>().unwrap(),
 		None => value
 	};
