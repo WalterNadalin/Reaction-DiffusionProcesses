@@ -11,7 +11,7 @@ Choose a small time step $\Delta t$. Compute the number of molecules $A(t)$ at t
 
 ![](https://github.com/WalterNadalin/Reaction-DiffusionProcesses/blob/main/ChemicalReactions/Degradation/plots/result.png)
 
-*Simulation(s) with* $25$ *initiale molecules, rate* $0.01 \[s^{-1}\]$ *and time step* $0.005 \[s\]$
+*Simulation(s) with* $25$ *initiale molecules, rate* $0.01\,\[s^{-1}\]$ *and time step* $0.005\,\[s\]$
 
 **Remark**: in the algorithm we replaced dt by the finite time step $\Delta t$. In order to get reasonably accurate results, we must ensure that $A(t)k \Delta t\ll 1$ during the simulation. Moreover, we generate a random number each step.
 
