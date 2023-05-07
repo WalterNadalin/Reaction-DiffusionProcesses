@@ -8,11 +8,12 @@ Choose a small time step $\Delta t$. Compute the number of molecules $A(t)$ at t
 1. generate a random number $r$ uniformly distributed in the interval $(0, 1)$
 2. if $r < A(t)k \Delta t$, then $A(t + ∆t) = A(t) − 1$
 
+
 ![](https://github.com/WalterNadalin/Reaction-DiffusionProcesses/blob/main/ChemicalReactions/Degradation/plots/result.png)
 
-*Simulations with 25 initiale molecules, rate 0.01 \[1/s\] and time step 0.005 \[s\] *
+*Simulation(s) with* $25$ *initiale molecules, rate* $0.01 \[s^{-1}\]$ *and time step* $0.005 \[s\]$
 
-**Time per run: **
+*Time per run:* $[ms]$
 
 **Remark**: in the algorithm we replaced dt by the finite time step $\Delta t$. In order to get reasonably accurate results, we must ensure that $A(t)k \Delta t\ll 1$ during the simulation. Moreover, we generate a random number each step.
 
