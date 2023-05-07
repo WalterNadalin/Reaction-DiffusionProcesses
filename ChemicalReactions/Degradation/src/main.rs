@@ -1,13 +1,18 @@
 use std::fs::OpenOptions;
 use std::io::{Write, BufWriter};
-use std::process::Command;
+use std::ops::{Mul, Div, Sub, AddAssign};
 use rand::Rng;
 use std::str::FromStr;
 use std::fmt::Debug;
 use std::time::Instant;
+use std::iter::Sum;
+use num::{NumCast, Zero};
 
-fn get_arg<T: FromStr + Debug>(index: usize, value: T) -> T 
-where <T as FromStr>::Err: Debug, {
+#[cfg(feature = "plot")]
+use std::process::Command;
+
+fn get_arg<T>(index: usize, value: T) -> T 
+where <T as FromStr>::Err: Debug, T: FromStr + Debug {
 	// Returns the parsed argument passed to the command line at position `index`	
 	//
 	// # Arguments
@@ -18,18 +23,95 @@ where <T as FromStr>::Err: Debug, {
 		None => value
 	};
 	
-	return arg;
+	arg
+}
+
+// Implementing the mean for the `std::iter::Iterator`, won't do it for the variance tough (or 
+// maybe I will)
+trait MeanExt: Iterator {
+	fn mean<M>(self) -> M
+	where
+		M: Mean<Self::Item>,
+		Self: Sized,
+	{
+		M::mean(self)
+	}
+}
+
+impl<I: Iterator> MeanExt for I {}
+
+trait Mean<A = Self> {
+	fn mean<I>(iter: I) -> Self
+	where
+		I: Iterator<Item = A>;
+}
+
+impl<T> Mean for T 
+where 
+		T: AddAssign<T> + Div<T, Output = T> + NumCast + Zero + Copy 
+	{
+		fn mean<I>(iter: I) -> Self
+		where 
+			I: Iterator<Item = T>,
+		{
+			let mut sum = T::zero();
+			let mut count: usize = 0;
+
+			for v in iter {
+					sum += v;
+					count += 1;
+			}
+
+			sum / num::cast(count).unwrap()
+		}
+}
+
+impl<'a, T> Mean<&'a T> for T
+where T: AddAssign<T> + Div<T, Output = T> + NumCast + Zero + Copy + 'a {
+	fn mean<I>(iter: I) -> Self
+	where I: Iterator<Item = &'a T>,
+	{
+		iter.copied().mean()
+	}
+}
+
+// Implementing generic functions for the mean and the variance
+/* fn mean<'a, T>(data: &'a[T]) -> T
+where T: Div<T, Output = T> + Sum<&'a T> + NumCast, {
+	// Returns the estimated mean of the values in data	
+	//
+	// # Arguments
+	// * `data` - An array of values
+	data.iter().sum::<T>() / num::cast(data.len()).unwrap()
+} */
+
+fn variance<'a, T>(data: &'a[T]) -> T
+where T: Mul<T, Output = T> + Div<T, Output = T> + Sub<T, Output = T> + AddAssign<T> +
+				 Zero + Copy + NumCast + Sum<&'a T> {
+	// Returns the estimated variance of the values in data	
+	//
+	// # Arguments
+	// * `data` - An array of values
+	let mut variance = T::zero(); 
+	let mean: T = data.iter().mean();
+	
+	for &value in data {
+		variance += (mean - value) * (mean - value);
+	}
+	
+	variance / num::cast(data.len()).unwrap()
 }
 
 fn main() {									
 	let molecules = get_arg::<u32>(0, 20); // Number of molecules
 	let rate: f32 = get_arg(1, 0.1); // Rate of degradation
 	let step: f32 = get_arg(2, 0.005); // Time step
-	let sims: u32 = get_arg(3, 1); // Number of simulations to run
+	let sims: usize = get_arg(3, 1); // Number of simulations to run
 	let mut count = molecules;
 	let mut time: f32 = 0.0;
 	let mut rng = rand::thread_rng();
 	let mut random: f32;
+	let mut times: Vec<f32> = vec![0.0; sims];
 
 	let file = OpenOptions::new() // Open and flush if present else create the file
 		.write(true)
@@ -41,10 +123,12 @@ fn main() {
 	let mut writer = BufWriter::new(&file);
 	 
 	// Simulations
-	let start = Instant::now();
+	let mut start: Instant;
 
 	// #[cfg(feature = "naive")] 
-	for _ in 0..sims {
+	for run in 0..sims {
+		start = Instant::now();
+	
 		while count > 0 {
 			random = rng.gen(); // Generates a float between 0 and 1
 
@@ -60,15 +144,20 @@ fn main() {
 		write!(writer, "{}\t{}\n\n\n", time, count).unwrap();
 		count = molecules;
 		time = 0.0;
+		
+		times[run] = start.elapsed().as_secs_f32();
 	}
 	
 	writer.flush().unwrap();
 	file.sync_all().unwrap(); // Wait that all the data are written on the file
 	
-	let duration = start.elapsed();
+	let mu = times.iter().mean::<f32>(); // Compute mean
+	let sigma = variance(&times).sqrt(); // Compute standard deviation
 
-	println!("\n\tTime: {:?}\n", duration);
+  println!("\n\tTime (\u{00B5} \u{00B1} \u{03C3} on {} runs): \
+  				 {:?} \u{00B1} {:?} [s]\n", sims, mu, sigma);
 
+	#[cfg(feature = "plot")] 
 	let _output = Command::new("gnuplot")
 		.arg("plots/plot.plt")
 		.output()
